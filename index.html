@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siquijor Rides - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean-blue: #006994;
+            --turquoise: #40E0D0;
+            --coral: #FF6B6B;
+            --sand: #F4E4C1;
+            --palm-green: #2E8B57;
+            --sunset-orange: #FF8C42;
+            --tropical-gradient: linear-gradient(135deg, #40E0D0 0%, #20B2AA 50%, #008B8B 100%);
+            --sunset-gradient: linear-gradient(135deg, #FF8C42 0%, #FF6B6B 50%, #FF4757 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #87CEEB 0%, #40E0D0 30%, #20B2AA 70%, #008B8B 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Tropical Background Elements */
+        .palm-tree {
+            position: fixed;
+            font-size: 150px;
+            opacity: 0.1;
+            z-index: 0;
+            animation: sway 4s ease-in-out infinite;
+        }
+
+        .palm-tree.left {
+            bottom: -20px;
+            left: -30px;
+            transform: rotate(-15deg);
+        }
+
+        .palm-tree.right {
+            bottom: -20px;
+            right: -30px;
+            transform: rotate(15deg) scaleX(-1);
+        }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(-10deg); }
+        }
+
+        .sun {
+            position: fixed;
+            top: 50px;
+            right: 50px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, #FFD700 0%, #FFA500 70%, transparent 100%);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .waves {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23ffffff' fill-opacity='0.1' d='M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,112C672,96,768,96,864,112C960,128,1056,160,1152,160C1248,160,1344,128,1392,112L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+            background-size: cover;
+        }
+
+        .login-container {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.5);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-icon {
+            width: 100px;
+            height: 100px;
+            background: var(--tropical-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 50px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(64,224,208,0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo-section h1 {
+            color: var(--ocean-blue);
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .logo-section p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: #f0f0f0;
+            padding: 5px;
+            border-radius: 15px;
+        }
+
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .role-btn.active {
+            background: white;
+            color: var(--ocean-blue);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .role-btn.admin.active {
+            color: var(--coral);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 18px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--turquoise);
+            box-shadow: 0 0 0 4px rgba(64,224,208,0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--tropical-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(64,224,208,0.4);
+        }
+
+        .login-btn.admin {
+            background: var(--sunset-gradient);
+        }
+
+        .login-btn.admin:hover {
+            box-shadow: 0 15px 30px rgba(255,107,107,0.4);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: rgba(255,71,87,0.1);
+            border: 1px solid rgba(255,71,87,0.3);
+            color: #ff4757;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 14px;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .register-link a {
+            color: var(--ocean-blue);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .tropical-decoration {
+            position: absolute;
+            font-size: 30px;
+            opacity: 0.2;
+            animation: float-decoration 4s ease-in-out infinite;
+        }
+
+        @keyframes float-decoration {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: #999;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .forgot-password a:hover {
+            color: var(--ocean-blue);
+        }
+
+        /* Demo credentials hint */
+        .demo-hint {
+            background: rgba(64,224,208,0.1);
+            border: 1px solid rgba(64,224,208,0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .demo-hint strong {
+            color: var(--ocean-blue);
+        }
+    </style>
+</head>
+<body>
+    <!-- Tropical Background -->
+    <div class="sun"></div>
+    <div class="palm-tree left">🌴</div>
+    <div class="palm-tree right">🌴</div>
+    <div class="waves"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <i class="fas fa-motorcycle"></i>
+                </div>
+                <h1>🏝️ Siquijor Rides</h1>
+                <p>Your Island Transport Solution</p>
+            </div>
+
+            <div class="role-selector">
+                <button class="role-btn active" onclick="selectRole('driver')">
+                    <i class="fas fa-motorcycle"></i> Driver
+                </button>
+                <button class="role-btn admin" onclick="selectRole('admin')">
+                    <i class="fas fa-shield-alt"></i> Admin
+                </button>
+            </div>
+
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label><i class="fas fa-user-circle"></i> User ID</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="userId" placeholder="Enter your User ID" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key"></i>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                </div>
+
+                <div class="forgot-password">
+                    <a href="#" onclick="showForgotPassword()">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+
+            <div class="register-link">
+                Don't have an account? <a href="#" onclick="showRegister()">Contact Admin</a>
+            </div>
+
+            <!-- Demo Credentials -->
+            <div class="demo-hint">
+                <strong>🧪 Demo Mode:</strong><br>
+                Driver: <code>DRV001</code> / <code>driver123</code><br>
+                Admin: <code>ADMIN001</code> / <code>admin123</code>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FIXED: Configuration - Update this with your actual Google Script URL
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+        let currentRole = 'driver';
+
+        function selectRole(role) {
+            currentRole = role;
+            document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.role-btn').classList.add('active');
+
+            const loginBtn = document.getElementById('loginBtn');
+            if (role === 'admin') {
+                loginBtn.classList.add('admin');
+            } else {
+                loginBtn.classList.remove('admin');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+
+            const userId = document.getElementById('userId').value.trim();
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('errorMessage');
+
+            // Show loading
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading-spinner"></span> Authenticating...';
+            errorDiv.classList.remove('show');
+
+            try {
+                // Check if using default placeholder URL
+                if (GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
+                    console.log('Using demo mode - Google Script URL not configured');
+                    handleDemoLogin(userId, password);
+                    return;
+                }
+
+                // Authenticate with Google Sheets
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        type: 'authenticate',
+                        role: currentRole,
+                        userId: userId,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Save session
+                    const sessionData = {
+                        userId: userId,
+                        role: currentRole,
+                        name: result.name,
+                        plateNumber: result.plateNumber || '',
+                        position: result.position || '',
+                        loginTime: new Date().toISOString()
+                    };
+
+                    localStorage.setItem('siquijorRides_session', JSON.stringify(sessionData));
+
+                    // Redirect based on role
+                    if (currentRole === 'admin') {
+                        window.location.href = 'admin_dashboard.html';
+                    } else {
+                        window.location.href = 'driver_dashboard.html';
+                    }
+
+                } else {
+                    showError(result.message || 'Invalid credentials');
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                // Fall back to demo mode
+                handleDemoLogin(userId, password);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
+            }
+        }
+
+        function handleDemoLogin(userId, password) {
+            // Demo credentials for testing
+            const demoAccounts = {
+                'driver': [
+                    { userId: 'DRV001', password: 'driver123', name: 'Mario Santos', plateNumber: 'SIQ-1234' },
+                    { userId: 'DRV002', password: 'driver123', name: 'John Doe', plateNumber: 'SIQ-5678' }
+                ],
+                'admin': [
+                    { userId: 'ADMIN001', password: 'admin123', name: 'Admin User', position: 'Manager' }
+                ]
+            };
+
+            const accounts = demoAccounts[currentRole] || [];
+            const account = accounts.find(a => a.userId === userId && a.password === password);
+
+            if (account) {
+                const sessionData = {
+                    userId: userId,
+                    role: currentRole,
+                    name: account.name,
+                    plateNumber: account.plateNumber || '',
+                    position: account.position || '',
+                    loginTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('siquijorRides_session', JSON.stringify(sessionData));
+
+                if (currentRole === 'admin') {
+                    window.location.href = 'admin_dashboard.html';
+                } else {
+                    window.location.href = 'driver_dashboard.html';
+                }
+            } else {
+                showError('Invalid User ID or Password. Try demo credentials shown below.');
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            document.getElementById('errorText').textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function showForgotPassword() {
+            alert('Please contact the admin to reset your password.\n\nAdmin Contact: admin@siquijor-rides.com');
+        }
+
+        function showRegister() {
+            alert('New driver registration must be done by the admin.\n\nPlease contact admin with your details.\nRequired: Name, Phone, Plate Number');
+        }
+
+        // Check if already logged in
+        const session = localStorage.getItem('siquijorRides_session');
+        if (session) {
+            const data = JSON.parse(session);
+            // Check if session is still valid (24 hours)
+            const loginTime = new Date(data.loginTime);
+            const now = new Date();
+            const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+
+            if (hoursDiff < 24) {
+                if (data.role === 'admin') {
+                    window.location.href = 'admin_dashboard.html';
+                } else {
+                    window.location.href = 'driver_dashboard.html';
+                }
+            } else {
+                localStorage.removeItem('siquijorRides_session');
+            }
+        }
+    </script>
+</body>
+</html>
