@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siquijor Rides - Driver Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean-blue: #006994;
+            --turquoise: #40E0D0;
+            --coral: #FF6B6B;
+            --sand: #F4E4C1;
+            --palm-green: #2E8B57;
+            --sunset-orange: #FF8C42;
+            --tropical-gradient: linear-gradient(135deg, #40E0D0 0%, #20B2AA 50%, #008B8B 100%);
+            --sunset-gradient: linear-gradient(135deg, #FF8C42 0%, #FF6B6B 50%, #FF4757 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(180deg, #E0F7FA 0%, #B2EBF2 30%, #80DEEA 70%, #4DD0E1 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 100%);
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        /* Tropical Header */
+        .header {
+            background: var(--tropical-gradient);
+            padding: 25px 20px;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 40px rgba(64,224,208,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '🌴';
+            position: absolute;
+            font-size: 100px;
+            opacity: 0.1;
+            right: -20px;
+            top: -20px;
+            transform: rotate(15deg);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .driver-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .driver-avatar-large {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            border: 4px solid rgba(255,255,255,0.5);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        .driver-info-header h2 {
+            font-size: 22px;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .driver-plate {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            background: rgba(255,255,255,0.9);
+            color: var(--ocean-blue);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .driver-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin-top: 8px;
+        }
+
+        .status-online {
+            width: 8px;
+            height: 8px;
+            background: #2ECC71;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-offline {
+            width: 8px;
+            height: 8px;
+            background: var(--coral);
+            border-radius: 50%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        /* Earnings Bar */
+        .earnings-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .earnings-item {
+            text-align: center;
+            color: white;
+        }
+
+        .earnings-value {
+            font-size: 26px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .earnings-label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-top: 3px;
+        }
+
+        /* Toggle Container */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(145deg, #FFFFFF 0%, #F5F5F5 100%);
+            margin: 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #E0E0E0;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 80px;
+            height: 40px;
+            background: #DDD;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 50%;
+            top: 4px;
+            left: 4px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .toggle-switch.active::after {
+            left: 44px;
+        }
+
+        /* Section Titles */
+        .section-title {
+            padding: 0 20px;
+            margin: 25px 0 15px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ocean-blue);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--turquoise);
+        }
+
+        .verified-badge {
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Booking Cards */
+        .booking-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 0 20px 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #F0F0F0;
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .booking-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--turquoise);
+        }
+
+        .booking-card.accepted::before {
+            background: var(--sunset-orange);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .booking-type {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .booking-type i {
+            font-size: 24px;
+            color: var(--turquoise);
+        }
+
+        .booking-type h4 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .booking-fare {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--palm-green);
+        }
+
+        .route-info {
+            background: #F8F9FA;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .route-point {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .route-point:last-child {
+            margin-bottom: 0;
+        }
+
+        .route-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--turquoise);
+        }
+
+        .route-dot.destination {
+            background: var(--coral);
+        }
+
+        .route-line {
+            width: 2px;
+            height: 20px;
+            background: #DDD;
+            margin-left: 5px;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .payment-verified {
+            background: linear-gradient(145deg, rgba(46,204,113,0.1) 0%, rgba(46,204,113,0.05) 100%);
+            border: 2px solid rgba(46,204,113,0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .payment-verified i {
+            color: #2ECC71;
+            font-size: 24px;
+        }
+
+        .commission-notice {
+            background: linear-gradient(145deg, rgba(255,107,107,0.1) 0%, rgba(255,107,107,0.05) 100%);
+            border: 2px solid rgba(255,107,107,0.2);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 12px;
+            text-align: center;
+            color: #666;
+        }
+
+        .commission-notice strong {
+            color: var(--coral);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-accept {
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(46,204,113,0.3);
+        }
+
+        .btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46,204,113,0.4);
+        }
+
+        .btn-accept:disabled {
+            background: #CCC;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-decline {
+            background: #F0F0F0;
+            color: #666;
+            border: 2px solid #E0E0E0;
+        }
+
+        .btn-complete {
+            background: var(--sunset-gradient);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255,140,66,0.3);
+        }
+
+        /* GPS Section */
+        .gps-section {
+            background: linear-gradient(145deg, #FFFFFF 0%, #F0F9FF 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #E0F0FF;
+        }
+
+        .gps-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .gps-header h4 {
+            color: var(--ocean-blue);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .gps-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #2ECC71;
+            font-weight: 600;
+        }
+
+        .gps-indicator {
+            width: 10px;
+            height: 10px;
+            background: #2ECC71;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .gps-error {
+            color: var(--coral);
+        }
+
+        .gps-error .gps-indicator {
+            background: var(--coral);
+            animation: none;
+        }
+
+        .map-view {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(145deg, #E0F7FA 0%, #B2EBF2 100%);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: var(--sunset-gradient);
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 20px rgba(255,107,107,0.4);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: rotate(-45deg) translateY(0); }
+            50% { transform: rotate(-45deg) translateY(-10px); }
+        }
+
+        .map-marker i {
+            transform: rotate(45deg);
+            font-size: 18px;
+            color: white;
+        }
+
+        .coords {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 11px;
+            background: rgba(255,255,255,0.9);
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: #666;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #F0F0F0;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--ocean-blue);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
+            border-top: 2px solid #F0F0F0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            color: var(--turquoise);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: var(--turquoise);
+            opacity: 0.5;
+        }
+
+        /* Refresh Button */
+        .refresh-btn {
+            background: white;
+            border: 2px solid var(--turquoise);
+            color: var(--ocean-blue);
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 20px 20px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--turquoise);
+            color: white;
+        }
+
+        .refresh-btn.spinning i {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .last-updated {
+            text-align: center;
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideDown 0.3s;
+            display: none;
+            box-shadow: 0 10px 30px rgba(46,204,113,0.4);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); }
+            to { transform: translateX(-50%) translateY(0); }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* GPS Error Message */
+        .gps-error-message {
+            background: rgba(255,107,107,0.1);
+            border: 1px solid rgba(255,107,107,0.3);
+            color: var(--coral);
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .gps-error-message.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="header-top">
+                <span style="color: white; font-size: 12px; opacity: 0.9;">🏝️ Siquijor Rides</span>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+
+            <div class="driver-profile">
+                <div class="driver-avatar-large">
+                    🏍️
+                </div>
+                <div class="driver-info-header">
+                    <h2 id="driverName">Loading...</h2>
+                    <div class="driver-plate" id="plateDisplay">
+                        <i class="fas fa-id-card"></i> <span id="plateNumber">---</span>
+                    </div>
+                    <div class="driver-status">
+                        <span class="status-online" id="statusIndicator"></span>
+                        <span id="statusText">Online</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="earnings-bar">
+                <div class="earnings-item">
+                    <div class="earnings-value" id="todayEarnings">₱0</div>
+                    <div class="earnings-label">Today's Earnings</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-value" id="totalTrips">0</div>
+                    <div class="earnings-label">Trips Today</div>
+                </div>
+                <div class="earnings-item">
+                    <div class="earnings-value" id="rating">5.0⭐</div>
+                    <div class="earnings-label">Rating</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toggle-container">
+            <span class="toggle-label">Offline</span>
+            <div class="toggle-switch active" id="onlineToggle" onclick="toggleOnline()"></div>
+            <span class="toggle-label" style="color: #2ECC71;">Online</span>
+        </div>
+
+        <!-- GPS TRACKING -->
+        <div class="gps-section">
+            <div class="gps-header">
+                <h4><i class="fas fa-satellite-dish"></i> GPS Tracking</h4>
+                <div class="gps-status" id="gpsStatusContainer">
+                    <span class="gps-indicator"></span>
+                    <span id="gpsStatus">Active</span>
+                </div>
+            </div>
+            <div class="map-view" id="driverMap">
+                <div class="map-marker" id="driverMarker" style="top: 50%; left: 50%;">
+                    <i class="fas fa-motorcycle"></i>
+                </div>
+                <div class="coords" id="coordinates">📍 Locating...</div>
+            </div>
+            <div class="gps-error-message" id="gpsErrorMsg">
+                <i class="fas fa-exclamation-triangle"></i> GPS access denied. Please enable location services in your browser settings.
+            </div>
+        </div>
+
+        <!-- VERIFIED BOOKINGS -->
+        <div class="section-title">
+            <i class="fas fa-clipboard-list"></i> Available Bookings
+            <span class="verified-badge"><i class="fas fa-shield-alt"></i> Admin Verified</span>
+        </div>
+
+        <p class="last-updated" id="lastUpdated">Last updated: Just now</p>
+
+        <button class="refresh-btn" onclick="refreshBookings()">
+            <i class="fas fa-sync-alt"></i> Refresh Bookings
+        </button>
+
+        <div id="pendingBookings">
+            <div class="empty-state">
+                <i class="fas fa-umbrella-beach"></i>
+                <p>No verified bookings available</p>
+                <small>Bookings appear here after admin verifies payment 🌴</small>
+            </div>
+        </div>
+
+        <!-- MY ACTIVE TRIPS -->
+        <div class="section-title">
+            <i class="fas fa-route"></i> My Active Trips
+        </div>
+
+        <div id="activeTrips">
+            <div class="empty-state">
+                <i class="fas fa-sun"></i>
+                <p>No active trips</p>
+                <small>Accept a booking to start your island adventure! 🏝️</small>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="section-title">
+            <i class="fas fa-chart-bar"></i> Today's Stats
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">⏰</div>
+                <div class="stat-value" id="onlineHours">0h</div>
+                <div class="stat-label">Online Hours</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🛣️</div>
+                <div class="stat-value" id="totalDistance">0km</div>
+                <div class="stat-label">Distance</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👍</div>
+                <div class="stat-value" id="acceptanceRate">0%</div>
+                <div class="stat-label">Acceptance Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-value" id="netEarnings">₱0</div>
+                <div class="stat-label">Net Earnings</div>
+            </div>
+        </div>
+
+        <div style="height: 100px;"></div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showSection('home')">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </div>
+        <div class="nav-item" onclick="showSection('earnings')">
+            <i class="fas fa-wallet"></i>
+            <span>Earnings</span>
+        </div>
+        <div class="nav-item" onclick="showSection('history')">
+            <i class="fas fa-history"></i>
+            <span>History</span>
+        </div>
+        <div class="nav-item" onclick="showSection('profile')">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Action Completed! 🌴</div>
+
+    <script>
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwCDyfNM8hiMfD9v0u_CA0rt5oh-WYbgZzDT6PqEsMupAXx-2WDSnx--TqwaV2ZxCM/exec';
+
+        // Check authentication
+        const session = JSON.parse(localStorage.getItem('siquijorRides_session') || '{}');
+        if (!session.userId || session.role !== 'driver') {
+            // FIXED: Redirect to correct filename
+            window.location.href = 'index.html';
+        }
+
+        const DRIVER_ID = session.userId;
+        const DRIVER_NAME = session.name || 'Driver';
+        const PLATE_NUMBER = session.plateNumber || 'SIQ-0000';
+
+        // Set driver info
+        document.getElementById('driverName').textContent = DRIVER_NAME;
+        document.getElementById('plateNumber').textContent = PLATE_NUMBER;
+
+        let isOnline = true;
+        let driverLocation = { lat: null, lng: null };
+        let watchId = null;
+        let availableBookings = [];
+        let myTrips = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDriverData();
+            startGPSTracking();
+            fetchVerifiedBookings();
+            setInterval(fetchVerifiedBookings, 30000);
+        });
+
+       function logout() {
+    if (confirm('Are you sure you want to logout? 🌴')) {
+        localStorage.removeItem('siquijorRides_session');
+        window.location.href = 'index.html'; // This is correct
+    }
+}
+
+        function toggleOnline() {
+            isOnline = !isOnline;
+            const toggle = document.getElementById('onlineToggle');
+            const statusText = document.getElementById('statusText');
+            const indicator = document.getElementById('statusIndicator');
+
+            if (isOnline) {
+                toggle.classList.add('active');
+                statusText.textContent = 'Online';
+                indicator.className = 'status-online';
+                showToast('🏝️ You are now ONLINE and ready for island adventures!');
+                startGPSTracking();
+                fetchVerifiedBookings();
+            } else {
+                toggle.classList.remove('active');
+                statusText.textContent = 'Offline';
+                indicator.className = 'status-offline';
+                showToast('You are now OFFLINE 🌅');
+                stopGPSTracking();
+            }
+
+            updateDriverStatus();
+        }
+
+        // FIXED: Better GPS handling with error states
+        function startGPSTracking() {
+            if (!navigator.geolocation) {
+                showGPSError('GPS not supported on this device');
+                return;
+            }
+
+            // Request permission and start tracking
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    // Success - start watching
+                    watchId = navigator.geolocation.watchPosition(
+                        (position) => {
+                            driverLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                accuracy: position.coords.accuracy,
+                                timestamp: new Date().toISOString()
+                            };
+
+                            updateMapDisplay();
+                            sendLocationToServer();
+                            clearGPSError();
+                        },
+                        (error) => {
+                            handleGPSError(error);
+                        },
+                        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                    );
+                },
+                (error) => {
+                    handleGPSError(error);
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        function handleGPSError(error) {
+            let message = 'GPS unavailable';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    message = 'GPS access denied. Please enable location services.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = 'Location information unavailable.';
+                    break;
+                case error.TIMEOUT:
+                    message = 'Location request timed out.';
+                    break;
+            }
+            showGPSError(message);
+        }
+
+        function showGPSError(message) {
+            document.getElementById('coordinates').textContent = '📍 ' + message;
+            document.getElementById('gpsStatusContainer').classList.add('gps-error');
+            document.getElementById('gpsStatus').textContent = 'Error';
+            document.getElementById('gpsErrorMsg').classList.add('show');
+        }
+
+        function clearGPSError() {
+            document.getElementById('gpsStatusContainer').classList.remove('gps-error');
+            document.getElementById('gpsStatus').textContent = 'Active';
+            document.getElementById('gpsErrorMsg').classList.remove('show');
+        }
+
+        function stopGPSTracking() {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+        }
+
+        function updateMapDisplay() {
+            if (driverLocation.lat && driverLocation.lng) {
+                document.getElementById('coordinates').textContent = 
+                    `📍 ${driverLocation.lat.toFixed(4)}°N, ${driverLocation.lng.toFixed(4)}°E`;
+            }
+        }
+
+        function sendLocationToServer() {
+            if (!driverLocation.lat) return;
+
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'driver_location',
+                    driverId: DRIVER_ID,
+                    location: driverLocation
+                })
+            }).catch(() => {
+                // Silently fail - offline mode
+            });
+        }
+
+        async function fetchVerifiedBookings() {
+            if (!isOnline) return;
+
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL + '?action=get_verified_bookings');
+                const data = await response.json();
+
+                if (data.bookings && data.bookings.length > 0) {
+                    availableBookings = data.bookings;
+                    renderBookings(data.bookings);
+                } else {
+                    renderEmptyState();
+                }
+
+                document.getElementById('lastUpdated').textContent = 
+                    '🌴 Last updated: ' + new Date().toLocaleTimeString();
+
+            } catch (error) {
+                const cached = localStorage.getItem('verifiedBookings');
+                if (cached) renderBookings(JSON.parse(cached));
+            }
+        }
+
+        function renderBookings(bookings) {
+            const container = document.getElementById('pendingBookings');
+
+            if (bookings.length === 0) {
+                renderEmptyState();
+                return;
+            }
+
+            container.innerHTML = bookings.map(booking => `
+                <div class="booking-card" data-booking-id="${booking.id}">
+                    <div class="booking-header">
+                        <div class="booking-type">
+                            <i class="fas fa-${booking.service === 'pedicab' ? 'bicycle' : 'box'}"></i>
+                            <div>
+                                <h4>${booking.service === 'pedicab' ? '🚲 Pedicab' : '📦 Delivery'} Request</h4>
+                                <small style="color: #999;">${formatTime(booking.timestamp)}</small>
+                            </div>
+                        </div>
+                        <div class="booking-fare">₱${booking.fare}</div>
+                    </div>
+
+                    <div class="route-info">
+                        <div class="route-point">
+                            <div class="route-dot"></div>
+                            <span><strong>Pickup:</strong> ${booking.pickup}</span>
+                        </div>
+                        <div class="route-line"></div>
+                        <div class="route-point">
+                            <div class="route-dot destination"></div>
+                            <span><strong>Destination:</strong> ${booking.destination}</span>
+                        </div>
+                    </div>
+
+                    <div class="customer-info">
+                        <i class="fas fa-user"></i>
+                        <span>${booking.customerName} • ${booking.phone}</span>
+                    </div>
+
+                    <div class="payment-verified">
+                        <i class="fas fa-check-circle"></i>
+                        <div>
+                            <strong>✅ Payment Verified by Admin</strong><br>
+                            <small>Ref: ${booking.paymentRef}</small>
+                        </div>
+                    </div>
+
+                    <div class="commission-notice">
+                        <strong>💰 You earn: ₱${Math.floor(booking.fare * 0.8)}</strong> 
+                        (Platform fee: ₱${Math.floor(booking.fare * 0.2)})
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-accept" onclick="acceptBooking('${booking.id}')">
+                            <i class="fas fa-check"></i> Accept
+                        </button>
+                        <button class="btn btn-decline" onclick="declineBooking('${booking.id}')">
+                            <i class="fas fa-times"></i> Decline
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            localStorage.setItem('verifiedBookings', JSON.stringify(bookings));
+        }
+
+        function renderEmptyState() {
+            document.getElementById('pendingBookings').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-umbrella-beach"></i>
+                    <p>No verified bookings available</p>
+                    <small>Bookings appear here after admin verifies payment 🌴</small>
+                </div>
+            `;
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000 / 60);
+
+            if (diff < 1) return 'Just now 🌴';
+            if (diff < 60) return diff + ' mins ago';
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        async function acceptBooking(bookingId) {
+            const btn = event.target.closest('.btn-accept');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Accepting...';
+
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        type: 'accept_booking',
+                        bookingId: bookingId,
+                        driverId: DRIVER_ID,
+                        driverName: DRIVER_NAME,
+                        plateNumber: PLATE_NUMBER,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('🎉 Booking accepted! Customer notified.');
+
+                    const booking = availableBookings.find(b => b.id === bookingId);
+                    if (booking) {
+                        booking.driverName = DRIVER_NAME;
+                        booking.plateNumber = PLATE_NUMBER;
+                        booking.status = 'accepted';
+                        myTrips.push(booking);
+                        renderActiveTrips();
+                    }
+
+                    availableBookings = availableBookings.filter(b => b.id !== bookingId);
+                    renderBookings(availableBookings);
+                    updateEarnings(booking.fare * 0.8);
+                }
+
+            } catch (error) {
+                showToast('❌ Error accepting booking');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check"></i> Accept';
+            }
+        }
+
+        function declineBooking(bookingId) {
+            const card = document.querySelector(`[data-booking-id="${bookingId}"]`);
+            card.style.transform = 'translateX(-100%)';
+            card.style.opacity = '0';
+
+            setTimeout(() => {
+                availableBookings = availableBookings.filter(b => b.id !== bookingId);
+                renderBookings(availableBookings);
+                showToast('Booking declined 🌅');
+            }, 300);
+        }
+
+        function renderActiveTrips() {
+            const container = document.getElementById('activeTrips');
+
+            if (myTrips.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-sun"></i>
+                        <p>No active trips</p>
+                        <small>Accept a booking to start your island adventure! 🏝️</small>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = myTrips.map(trip => `
+                <div class="booking-card accepted" data-trip-id="${trip.id}">
+                    <div class="booking-header">
+                        <div class="booking-type">
+                            <i class="fas fa-${trip.service === 'pedicab' ? 'bicycle' : 'box'}"></i>
+                            <div>
+                                <h4>${trip.service === 'pedicab' ? '🚲 Pedicab' : '📦 Delivery'} - Active</h4>
+                                <small style="color: #2ECC71;">✅ You're assigned</small>
+                            </div>
+                        </div>
+                        <div class="booking-fare">₱${trip.fare}</div>
+                    </div>
+
+                    <div class="route-info">
+                        <div class="route-point">
+                            <div class="route-dot"></div>
+                            <span>${trip.pickup}</span>
+                        </div>
+                        <div class="route-line"></div>
+                        <div class="route-point">
+                            <div class="route-dot destination"></div>
+                            <span>${trip.destination}</span>
+                        </div>
+                    </div>
+
+                    <div class="customer-info">
+                        <i class="fas fa-user"></i>
+                        <span>${trip.customerName} • ${trip.phone}</span>
+                    </div>
+
+                    <button class="btn btn-complete" onclick="completeTrip('${trip.id}')" style="width: 100%;">
+                        <i class="fas fa-flag-checkered"></i> Complete Trip 🏁
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function completeTrip(tripId) {
+            try {
+                await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        type: 'complete_trip',
+                        tripId: tripId,
+                        driverId: DRIVER_ID,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                showToast('🎉 Trip completed! Great job! 🌴');
+                myTrips = myTrips.filter(t => t.id !== tripId);
+                renderActiveTrips();
+
+            } catch (error) {
+                showToast('Trip completed! 🏝️');
+                myTrips = myTrips.filter(t => t.id !== tripId);
+                renderActiveTrips();
+            }
+        }
+
+        function updateEarnings(amount) {
+            let current = parseFloat(localStorage.getItem('todayEarnings_' + DRIVER_ID) || '0');
+            current += amount;
+            localStorage.setItem('todayEarnings_' + DRIVER_ID, current);
+            document.getElementById('todayEarnings').textContent = '₱' + Math.floor(current);
+
+            let trips = parseInt(localStorage.getItem('todayTrips_' + DRIVER_ID) || '0');
+            trips += 1;
+            localStorage.setItem('todayTrips_' + DRIVER_ID, trips);
+            document.getElementById('totalTrips').textContent = trips;
+        }
+
+        function loadDriverData() {
+            const earnings = parseFloat(localStorage.getItem('todayEarnings_' + DRIVER_ID) || '0');
+            const trips = parseInt(localStorage.getItem('todayTrips_' + DRIVER_ID) || '0');
+
+            document.getElementById('todayEarnings').textContent = '₱' + Math.floor(earnings);
+            document.getElementById('totalTrips').textContent = trips;
+        }
+
+        function updateDriverStatus() {
+            fetch(GOOGLE_SHEETS_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'driver_status',
+                    driverId: DRIVER_ID,
+                    status: isOnline ? 'online' : 'offline',
+                    timestamp: new Date().toISOString()
+                })
+            }).catch(() => {
+                // Offline fallback - status will sync when online
+            });
+        }
+
+        function refreshBookings() {
+            const btn = document.querySelector('.refresh-btn');
+            btn.classList.add('spinning');
+
+            fetchVerifiedBookings().then(() => {
+                setTimeout(() => btn.classList.remove('spinning'), 500);
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+
+        function showSection(section) {
+            showToast(section + ' section coming soon! 🌴');
+        }
+    </script>
+</body>
+</html>

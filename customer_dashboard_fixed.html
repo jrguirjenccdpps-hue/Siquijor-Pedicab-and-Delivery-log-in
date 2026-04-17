@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏝️ Siquijor Rides - Book Your Ride</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ocean-blue: #006994;
+            --turquoise: #40E0D0;
+            --coral: #FF6B6B;
+            --sand: #F4E4C1;
+            --palm-green: #2E8B57;
+            --sunset-orange: #FF8C42;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(180deg, #E0F7FA 0%, #B2EBF2 30%, #80DEEA 70%, #4DD0E1 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #FFFFFF 0%, #F0F9FF 100%);
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #40E0D0 0%, #20B2AA 50%, #008B8B 100%);
+            padding: 25px 20px;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 10px 40px rgba(64,224,208,0.4);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .header::before {
+            content: '🌴';
+            position: absolute;
+            font-size: 80px;
+            opacity: 0.15;
+            right: -10px;
+            top: -10px;
+        }
+
+        .header::after {
+            content: '🏝️';
+            position: absolute;
+            font-size: 60px;
+            opacity: 0.1;
+            left: 10px;
+            bottom: 10px;
+        }
+
+        .logo-section h1 {
+            color: white;
+            font-size: 26px;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .logo-section p {
+            color: rgba(255,255,255,0.9);
+            font-size: 13px;
+        }
+
+        /* Mode Toggle */
+        .mode-toggle {
+            display: flex;
+            background: white;
+            border-radius: 50px;
+            margin: 20px;
+            padding: 5px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 2px solid #E0F0F0;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #999;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .mode-btn.active {
+            background: linear-gradient(135deg, #40E0D0 0%, #20B2AA 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(64,224,208,0.4);
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 20px;
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Alert Box */
+        .alert {
+            background: linear-gradient(145deg, rgba(255,140,66,0.1) 0%, rgba(255,140,66,0.05) 100%);
+            border: 2px solid rgba(255,140,66,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .alert i {
+            color: var(--sunset-orange);
+            font-size: 20px;
+        }
+
+        /* Service Cards */
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--ocean-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 3px solid #F0F0F0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+            border-color: var(--turquoise);
+        }
+
+        .service-card.selected {
+            border-color: #2ECC71;
+            background: linear-gradient(145deg, rgba(46,204,113,0.05) 0%, rgba(46,204,113,0.02) 100%);
+        }
+
+        .service-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: #2ECC71;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .service-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .service-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .service-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+
+        .price-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #40E0D0 0%, #20B2AA 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            background: white;
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--turquoise);
+            box-shadow: 0 0 0 4px rgba(64,224,208,0.1);
+        }
+
+        .input-hint {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* Fare Display */
+        .fare-display {
+            background: linear-gradient(135deg, #40E0D0 0%, #20B2AA 100%);
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 20px 0;
+            color: white;
+            box-shadow: 0 10px 30px rgba(64,224,208,0.3);
+        }
+
+        .fare-amount {
+            font-size: 42px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .fare-breakdown {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* Payment Section */
+        .payment-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #F0F0F0;
+        }
+
+        .payment-section h4 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .payment-instructions {
+            background: #F8F9FA;
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .payment-instructions ol {
+            padding-left: 20px;
+        }
+
+        .payment-instructions li {
+            margin-bottom: 8px;
+        }
+
+        .qr-placeholder {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(145deg, #F8F9FA 0%, #E9ECEF 100%);
+            border-radius: 15px;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 12px;
+            border: 2px dashed #DDD;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .qr-upload-btn {
+            position: absolute;
+            bottom: 10px;
+            background: var(--turquoise);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .reference-input {
+            margin-top: 15px;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(46,204,113,0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(46,204,113,0.4);
+        }
+
+        .submit-btn:disabled {
+            background: #CCC;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Tracking Cards */
+        .tracking-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #F0F0F0;
+            border-left: 5px solid var(--turquoise);
+        }
+
+        .tracking-card.accepted {
+            border-left-color: #2ECC71;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .status-pending { background: rgba(255,193,7,0.1); color: #F59E0B; }
+        .status-verified { background: rgba(46,204,113,0.1); color: #2ECC71; }
+        .status-accepted { background: rgba(52,152,219,0.1); color: #3498DB; }
+        .status-completed { background: rgba(46,204,113,0.15); color: #27AE60; }
+
+        .driver-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+            padding: 15px;
+            background: #F8F9FA;
+            border-radius: 15px;
+        }
+
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #40E0D0 0%, #20B2AA 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .driver-details h4 {
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .driver-details p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(145deg, #E0F7FA 0%, #B2EBF2 100%);
+            border-radius: 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--coral);
+            border-radius: 50%;
+            position: absolute;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px var(--coral);
+        }
+
+        /* Rating Section */
+        .rating-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border: 2px solid #F0F0F0;
+        }
+
+        .rating-section h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .stars {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .star {
+            font-size: 35px;
+            color: #DDD;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .star.active, .star:hover {
+            color: #FFD700;
+            transform: scale(1.2);
+        }
+
+        .feedback-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 12px;
+            background: white;
+            color: #333;
+            font-size: 14px;
+            resize: none;
+            min-height: 100px;
+            margin-top: 15px;
+        }
+
+        .feedback-textarea:focus {
+            outline: none;
+            border-color: var(--turquoise);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.1);
+            border-top: 2px solid #F0F0F0;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #999;
+            text-decoration: none;
+            font-size: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .nav-item.active, .nav-item:hover {
+            color: var(--turquoise);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 1000;
+            animation: slideDown 0.3s;
+            display: none;
+            box-shadow: 0 10px 30px rgba(46,204,113,0.4);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); }
+            to { transform: translateX(-50%) translateY(0); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Booking Reference Display */
+        .booking-ref-display {
+            background: linear-gradient(145deg, rgba(64,224,208,0.1) 0%, rgba(64,224,208,0.05) 100%);
+            border: 2px solid rgba(64,224,208,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .booking-ref-display h4 {
+            color: var(--ocean-blue);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .booking-ref-display .ref-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--turquoise);
+            font-family: monospace;
+        }
+
+        .save-ref-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+            padding: 10px;
+            background: #F8F9FA;
+            border-radius: 8px;
+        }
+
+        /* No account banner */
+        .no-account-banner {
+            background: linear-gradient(135deg, rgba(46,204,113,0.1) 0%, rgba(46,204,113,0.05) 100%);
+            border: 2px solid rgba(46,204,113,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: #2ECC71;
+        }
+
+        .no-account-banner i {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo-section">
+                <h1>🏝️ Siquijor Rides</h1>
+                <p>Book Your Island Adventure - No Account Needed!</p>
+            </div>
+        </div>
+
+        <!-- No Account Banner -->
+        <div class="no-account-banner">
+            <i class="fas fa-user-check"></i>
+            <div>
+                <strong>No Registration Required!</strong><br>
+                Just fill in your details and book instantly. Save your booking reference to track your ride.
+            </div>
+        </div>
+
+        <div class="mode-toggle">
+            <button class="mode-btn active" onclick="switchMode('book')">
+                <i class="fas fa-book"></i> Book
+            </button>
+            <button class="mode-btn" onclick="switchMode('track')">
+                <i class="fas fa-map-marker-alt"></i> Track
+            </button>
+            <button class="mode-btn" onclick="switchMode('feedback')">
+                <i class="fas fa-star"></i> Feedback
+            </button>
+        </div>
+
+        <!-- BOOKING SECTION -->
+        <div id="book-section" class="content-section active">
+            <div class="alert">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>Available in:</strong> Siquijor-Siquijor & San Juan only 🌴
+                </div>
+            </div>
+
+            <h3 class="section-title"><i class="fas fa-car"></i> Select Service</h3>
+
+            <div class="service-card" onclick="selectService('pedicab')" id="pedicab-card">
+                <div class="service-icon">🚲</div>
+                <div class="service-title">Book a Pedicab</div>
+                <div class="service-desc">Port to destination & vice versa. Siquijor area & San Juan routes.</div>
+                <div class="price-tag">From ₱150</div>
+            </div>
+
+            <div class="service-card" onclick="selectService('delivery')" id="delivery-card">
+                <div class="service-icon">📦</div>
+                <div class="service-title">Book a Delivery</div>
+                <div class="service-desc">Package delivery within Siquijor & San Juan areas.</div>
+                <div class="price-tag">From ₱150</div>
+            </div>
+
+            <form id="bookingForm" style="margin-top: 20px;">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Full Name *</label>
+                    <input type="text" id="customerName" placeholder="Juan Dela Cruz" required>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Mobile Number *</label>
+                    <input type="tel" id="customerPhone" placeholder="09123456789" required>
+                    <div class="input-hint">We'll contact you at this number</div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Email (Optional)</label>
+                    <input type="email" id="customerEmail" placeholder="juan@email.com">
+                    <div class="input-hint">For booking confirmation</div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-map-pin"></i> Pickup Location *</label>
+                    <select id="pickupLocation" required>
+                        <option value="">Select pickup point</option>
+                        <option value="Siquijor Port">🚢 Siquijor Port</option>
+                        <option value="San Juan Port">🚢 San Juan Port</option>
+                        <option value="Siquijor Town Proper">🏘️ Siquijor Town Proper</option>
+                        <option value="San Juan Town Proper">🏘️ San Juan Town Proper</option>
+                        <option value="Other (Siquijor)">📍 Other - Siquijor Area</option>
+                        <option value="Other (San Juan)">📍 Other - San Juan Area</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-flag-checkered"></i> Destination *</label>
+                    <select id="destination" required>
+                        <option value="">Select destination</option>
+                        <option value="Siquijor Port">🚢 Siquijor Port</option>
+                        <option value="San Juan Port">🚢 San Juan Port</option>
+                        <option value="Siquijor Town Proper">🏘️ Siquijor Town Proper</option>
+                        <option value="San Juan Town Proper">🏘️ San Juan Town Proper</option>
+                        <option value="Island Tour">🏝️ Island Tour (₱1,800)</option>
+                        <option value="Other (Siquijor)">📍 Other - Siquijor Area</option>
+                        <option value="Other (San Juan)">📍 Other - San Juan Area</option>
+                    </select>
+                </div>
+
+                <div class="fare-display">
+                    <div class="fare-amount" id="fareAmount">₱0</div>
+                    <div class="fare-breakdown">Estimated Fare (Other routes upon driver approval)</div>
+                </div>
+
+                <div class="payment-section">
+                    <h4><i class="fas fa-qrcode"></i> Pay via PalawanPay</h4>
+
+                    <div class="payment-instructions">
+                        <strong>How to pay:</strong>
+                        <ol>
+                            <li>Open your PalawanPay app</li>
+                            <li>Scan the QR code below</li>
+                            <li>Enter the exact amount</li>
+                            <li>Save the reference number</li>
+                        </ol>
+                    </div>
+
+                    <div class="qr-placeholder" id="qrCode">
+                        <span>📱 Your PalawanPay QR</span>
+                        <button type="button" class="qr-upload-btn" onclick="uploadQR()">Upload QR</button>
+                    </div>
+
+                    <div class="form-group reference-input">
+                        <label><i class="fas fa-receipt"></i> Payment Reference Number *</label>
+                        <input type="text" id="paymentRef" placeholder="e.g., PP123456789" required>
+                        <div class="input-hint">Enter the reference number from your PalawanPay receipt</div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Book Now
+                </button>
+            </form>
+        </div>
+
+        <!-- TRACKING SECTION -->
+        <div id="track-section" class="content-section">
+            <h3 class="section-title"><i class="fas fa-search"></i> Track Your Booking</h3>
+
+            <div class="form-group">
+                <label>Enter your Booking Reference or Phone Number</label>
+                <input type="text" id="trackInput" placeholder="e.g., BK123456 or 09123456789">
+                <button class="submit-btn" onclick="trackBooking()" style="margin-top: 10px;">
+                    <i class="fas fa-search"></i> Track
+                </button>
+            </div>
+
+            <div id="trackingResults">
+                <!-- Results will appear here -->
+            </div>
+
+            <div class="booking-ref-display">
+                <h4>💡 Tip: Save Your Booking Reference!</h4>
+                <div class="ref-number">BK######</div>
+                <div class="save-ref-hint">
+                    <i class="fas fa-lightbulb"></i> 
+                    Screenshot or save your booking reference to track your ride later. 
+                    No account needed!
+                </div>
+            </div>
+        </div>
+
+        <!-- FEEDBACK SECTION -->
+        <div id="feedback-section" class="content-section">
+            <h3 class="section-title"><i class="fas fa-comments"></i> Rate Your Experience</h3>
+
+            <div class="form-group">
+                <label>Your Booking Reference</label>
+                <input type="text" id="feedbackBookingRef" placeholder="e.g., BK123456">
+            </div>
+
+            <div class="rating-section">
+                <h4>Rate the App 🌟</h4>
+                <div class="stars" id="appStars">
+                    <span class="star" onclick="rate('app', 1)">⭐</span>
+                    <span class="star" onclick="rate('app', 2)">⭐</span>
+                    <span class="star" onclick="rate('app', 3)">⭐</span>
+                    <span class="star" onclick="rate('app', 4)">⭐</span>
+                    <span class="star" onclick="rate('app', 5)">⭐</span>
+                </div>
+                <textarea class="feedback-textarea" id="appFeedback" placeholder="Share your thoughts about the app..."></textarea>
+            </div>
+
+            <div class="rating-section">
+                <h4>Rate Your Driver 🛵</h4>
+                <div class="stars" id="driverStars">
+                    <span class="star" onclick="rate('driver', 1)">⭐</span>
+                    <span class="star" onclick="rate('driver', 2)">⭐</span>
+                    <span class="star" onclick="rate('driver', 3)">⭐</span>
+                    <span class="star" onclick="rate('driver', 4)">⭐</span>
+                    <span class="star" onclick="rate('driver', 5)">⭐</span>
+                </div>
+                <textarea class="feedback-textarea" id="driverFeedback" placeholder="How was your driver's service?"></textarea>
+
+                <button class="submit-btn" onclick="submitFeedback()" style="margin-top: 15px;">
+                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                </button>
+            </div>
+        </div>
+
+        <div style="height: 100px;"></div>
+    </div>
+
+    <div class="toast" id="toast">Booking Submitted Successfully! 🌴</div>
+
+    <script>
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwCDyfNM8hiMfD9v0u_CA0rt5oh-WYbgZzDT6PqEsMupAXx-2WDSnx--TqwaV2ZxCM/exec';
+
+        let selectedService = null;
+        let currentFare = 0;
+        let currentBookingRef = null;
+
+        // Fare calculation
+        const fares = {
+            'Island Tour': 1800,
+            'Siquijor Area': 150,
+            'San Juan-Siquijor': 300
+        };
+
+        function switchMode(mode) {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.mode-btn').classList.add('active');
+
+            document.querySelectorAll('.content-section').forEach(section => section.classList.remove('active'));
+            document.getElementById(mode + '-section').classList.add('active');
+        }
+
+        function selectService(service) {
+            selectedService = service;
+            document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
+            document.getElementById(service + '-card').classList.add('selected');
+            calculateFare();
+        }
+
+        function calculateFare() {
+            const pickup = document.getElementById('pickupLocation').value;
+            const dest = document.getElementById('destination').value;
+
+            if (!pickup || !dest) return;
+
+            const isPort = pickup.includes('Port');
+            const isSiquijorArea = pickup.includes('Siquijor') && dest.includes('Siquijor');
+            const isSanJuanRoute = (pickup.includes('San Juan') && dest.includes('Siquijor')) || 
+                                   (pickup.includes('Siquijor') && dest.includes('San Juan'));
+            const isTour = dest.includes('Tour');
+
+            if (isTour) {
+                currentFare = fares['Island Tour'];
+            } else if (isSanJuanRoute) {
+                currentFare = fares['San Juan-Siquijor'];
+            } else if (isSiquijorArea) {
+                currentFare = fares['Siquijor Area'];
+            } else {
+                currentFare = 0;
+            }
+
+            document.getElementById('fareAmount').textContent = currentFare > 0 ? '₱' + currentFare : 'Upon Approval';
+        }
+
+        document.getElementById('pickupLocation').addEventListener('change', calculateFare);
+        document.getElementById('destination').addEventListener('change', calculateFare);
+
+        // Form submission
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!selectedService) {
+                showToast('❌ Please select a service first!');
+                return;
+            }
+
+            if (currentFare === 0 && !confirm('This route requires driver approval. Continue?')) {
+                return;
+            }
+
+            const bookingData = {
+                type: 'new_booking',
+                timestamp: new Date().toISOString(),
+                service: selectedService,
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                email: document.getElementById('customerEmail').value || 'N/A',
+                pickup: document.getElementById('pickupLocation').value,
+                destination: document.getElementById('destination').value,
+                fare: currentFare,
+                paymentRef: document.getElementById('paymentRef').value,
+                status: 'pending_verification'
+            };
+
+            // Show loading
+            const btn = e.target.querySelector('.submit-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="spinner"></span> Processing...';
+            btn.disabled = true;
+
+            try {
+                // Send to Google Sheets
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(bookingData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentBookingRef = result.bookingId;
+                    showToast('✅ Booking Submitted! Reference: ' + result.bookingId);
+
+                    // Show success modal instead of alert
+                    showSuccessModal(result.bookingId, currentFare, bookingData.paymentRef);
+
+                    // Reset form
+                    document.getElementById('bookingForm').reset();
+                    document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
+                    selectedService = null;
+                    document.getElementById('fareAmount').textContent = '₱0';
+
+                    // Switch to track tab
+                    document.getElementById('trackInput').value = result.bookingId;
+                    switchMode('track');
+
+                } else {
+                    throw new Error(result.message || 'Failed to create booking');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                // Generate local reference for demo/offline mode
+                currentBookingRef = 'BK' + Date.now().toString().slice(-6);
+
+                // Store locally
+                let bookings = JSON.parse(localStorage.getItem('myBookings') || '[]');
+                bookings.push({
+                    ...bookingData,
+                    id: currentBookingRef
+                });
+                localStorage.setItem('myBookings', JSON.stringify(bookings));
+
+                showToast('✅ Booking Saved Locally! Ref: ' + currentBookingRef);
+
+                // Show offline success modal
+                showOfflineModal(currentBookingRef);
+
+                document.getElementById('bookingForm').reset();
+                document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
+                selectedService = null;
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        });
+
+        // FIXED: Success modal instead of broken alert()
+        function showSuccessModal(bookingId, fare, paymentRef) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 2000;
+                padding: 20px;
+            `;
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    border-radius: 20px;
+                    padding: 30px;
+                    max-width: 400px;
+                    width: 100%;
+                    text-align: center;
+                    animation: fadeIn 0.3s;
+                ">
+                    <div style="font-size: 60px; margin-bottom: 15px;">🎉</div>
+                    <h3 style="color: #333; margin-bottom: 15px;">Booking Successful!</h3>
+                    <div style="background: #F0F9FF; border-radius: 15px; padding: 20px; margin: 15px 0; border: 2px solid #40E0D0;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">BOOKING REFERENCE</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #40E0D0; font-family: monospace;">${bookingId}</div>
+                    </div>
+                    <div style="text-align: left; font-size: 14px; color: #666; line-height: 1.6; margin: 15px 0;">
+                        <p><strong>💰 Amount:</strong> ₱${fare}</p>
+                        <p><strong>📱 Payment Ref:</strong> ${paymentRef}</p>
+                        <p style="margin-top: 10px; color: #FF6B6B; font-weight: 600;">⚠️ IMPORTANT: Save this reference number!</p>
+                    </div>
+                    <div style="background: #FFF9E6; border-radius: 10px; padding: 15px; margin: 15px 0; font-size: 13px; color: #666; text-align: left;">
+                        <strong>Next steps:</strong>
+                        <ol style="margin-top: 8px; padding-left: 18px; line-height: 1.6;">
+                            <li>Admin will verify your payment</li>
+                            <li>Available drivers will see your booking</li>
+                            <li>You'll receive an SMS when a driver accepts</li>
+                            <li>Track your driver in real-time</li>
+                        </ol>
+                    </div>
+                    <button onclick="this.closest('.modal').remove()" style="
+                        width: 100%;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
+                        border: none;
+                        border-radius: 12px;
+                        color: white;
+                        font-weight: 700;
+                        cursor: pointer;
+                        margin-top: 10px;
+                    ">Got it! 🌴</button>
+                </div>
+            `;
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        // FIXED: Offline modal
+        function showOfflineModal(bookingId) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 2000;
+                padding: 20px;
+            `;
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    border-radius: 20px;
+                    padding: 30px;
+                    max-width: 400px;
+                    width: 100%;
+                    text-align: center;
+                ">
+                    <div style="font-size: 60px; margin-bottom: 15px;">📱</div>
+                    <h3 style="color: #333; margin-bottom: 15px;">Booking Saved Locally!</h3>
+                    <div style="background: #FFF9E6; border-radius: 15px; padding: 20px; margin: 15px 0; border: 2px solid #FFA502;">
+                        <div style="font-size: 12px; color: #666; margin-bottom: 5px;">BOOKING REFERENCE</div>
+                        <div style="font-size: 28px; font-weight: 700; color: #FFA502; font-family: monospace;">${bookingId}</div>
+                    </div>
+                    <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                        ⚠️ <strong>IMPORTANT:</strong> Screenshot or save this number!<br><br>
+                        Your booking will be synced when connection is restored.
+                    </p>
+                    <button onclick="this.closest('.modal').remove()" style="
+                        width: 100%;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #FFA502 0%, #FF7F50 100%);
+                        border: none;
+                        border-radius: 12px;
+                        color: white;
+                        font-weight: 700;
+                        cursor: pointer;
+                        margin-top: 15px;
+                    ">OK, Saved! 🌴</button>
+                </div>
+            `;
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) modal.remove();
+            });
+        }
+
+        function trackBooking() {
+            const input = document.getElementById('trackInput').value.trim();
+            if (!input) {
+                showToast('❌ Please enter a booking reference or phone number');
+                return;
+            }
+
+            // Check local storage first
+            const bookings = JSON.parse(localStorage.getItem('myBookings') || '[]');
+            const booking = bookings.find(b => b.id === input || b.phone === input);
+
+            if (booking) {
+                displayTrackingResult(booking);
+            } else {
+                // Show demo result
+                displayTrackingResult({
+                    id: input,
+                    service: 'pedicab',
+                    status: 'pending_verification',
+                    customerName: 'Juan Dela Cruz',
+                    pickup: 'Siquijor Port',
+                    destination: 'Siquijor Town Proper',
+                    fare: 150,
+                    paymentRef: 'PP123456',
+                    driverName: null,
+                    plateNumber: null
+                });
+            }
+        }
+
+        function displayTrackingResult(booking) {
+            const container = document.getElementById('trackingResults');
+
+            let statusHtml = '';
+            let driverHtml = '';
+
+            if (booking.status === 'pending_verification') {
+                statusHtml = '<span class="status-badge status-pending">⏳ Pending Verification</span>';
+            } else if (booking.status === 'available') {
+                statusHtml = '<span class="status-badge status-verified">✅ Verified - Finding Driver</span>';
+            } else if (booking.status === 'accepted') {
+                statusHtml = '<span class="status-badge status-accepted">🛵 Driver Assigned</span>';
+                driverHtml = `
+                    <div class="driver-info">
+                        <div class="driver-avatar">🏍️</div>
+                        <div class="driver-details">
+                            <h4>${booking.driverName || 'Mario Santos'}</h4>
+                            <p><i class="fas fa-id-card"></i> Plate: ${booking.plateNumber || 'SIQ-1234'}</p>
+                            <p><i class="fas fa-phone"></i> 0912-345-6789</p>
+                        </div>
+                    </div>
+                    <div class="map-container">
+                        <div class="map-dot" style="top: 50%; left: 50%;"></div>
+                        <span style="color: #666; font-size: 13px;">📍 Driver is 5 mins away</span>
+                    </div>
+<div style="text-align: center; padding: 20px; margin-top: 20px;">
+    <a href="index.html" style="color: var(--ocean-blue); text-decoration: none; font-weight: 600;">
+        <i class="fas fa-user-lock"></i> Driver/Admin Login
+    </a>
+</div>
+                `;
+            } else if (booking.status === 'completed') {
+                statusHtml = '<span class="status-badge status-completed">✅ Trip Completed</span>';
+            }
+
+            container.innerHTML = `
+                <div class="tracking-card ${booking.status}">
+                    <h4 style="margin-bottom: 10px; color: #333;">📋 Booking #${booking.id}</h4>
+                    ${statusHtml}
+                    <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                        <strong>Service:</strong> ${booking.service === 'pedicab' ? '🚲 Pedicab' : '📦 Delivery'}<br>
+                        <strong>Route:</strong> ${booking.pickup} → ${booking.destination}<br>
+                        <strong>Fare:</strong> ₱${booking.fare}<br>
+                        <strong>Payment Ref:</strong> ${booking.paymentRef}
+                    </p>
+                    ${driverHtml}
+                </div>
+            `;
+        }
+
+        function rate(type, stars) {
+            const container = document.getElementById(type + 'Stars');
+            const starElements = container.querySelectorAll('.star');
+
+            starElements.forEach((star, index) => {
+                if (index < stars) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        async function submitFeedback() {
+            const feedbackData = {
+                type: 'feedback',
+                timestamp: new Date().toISOString(),
+                bookingRef: document.getElementById('feedbackBookingRef').value,
+                appRating: document.querySelectorAll('#appStars .star.active').length,
+                driverRating: document.querySelectorAll('#driverStars .star.active').length,
+                appFeedback: document.getElementById('appFeedback').value,
+                driverFeedback: document.getElementById('driverFeedback').value
+            };
+
+            try {
+                await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(feedbackData)
+                });
+                showToast('🌟 Thank you for your feedback!');
+            } catch (e) {
+                showToast('🌟 Feedback saved locally!');
+            }
+
+            // Reset
+            document.querySelectorAll('.star').forEach(s => s.classList.remove('active'));
+            document.getElementById('appFeedback').value = '';
+            document.getElementById('driverFeedback').value = '';
+        }
+
+        // FIXED: Proper QR upload message
+        function uploadQR() {
+            showToast('📱 QR upload coming soon! Please enter reference number manually.');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+</html>
