@@ -418,8 +418,8 @@
     </div>
 
     <script>
-        // FIXED: Configuration - Update this with your actual Google Script URL
-        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+        // FIXED: Updated Google Script URL - REPLACE WITH YOUR ACTUAL URL
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwCDyfNM8hiMfD9v0u_CA0rt5oh-WYbgZzDT6PqEsMupAXx-2WDSnx--TqwaV2ZxCM/exec';
 
         let currentRole = 'driver';
 
@@ -483,11 +483,11 @@
 
                     localStorage.setItem('siquijorRides_session', JSON.stringify(sessionData));
 
-                    // Redirect based on role
+                    // FIXED: Redirect to correct filenames (matching your uploaded files)
                     if (currentRole === 'admin') {
-                        window.location.href = 'admin_dashboard.html';
+                        window.location.href = 'admin_dashboard_fixed.html';
                     } else {
-                        window.location.href = 'driver_dashboard.html';
+                        window.location.href = 'driver_dashboard_fixed.html';
                     }
 
                 } else {
@@ -531,10 +531,11 @@
 
                 localStorage.setItem('siquijorRides_session', JSON.stringify(sessionData));
 
+                // FIXED: Redirect to correct filenames
                 if (currentRole === 'admin') {
-                    window.location.href = 'admin_dashboard.html';
+                    window.location.href = 'admin_dashboard_fixed.html';
                 } else {
-                    window.location.href = 'driver_dashboard.html';
+                    window.location.href = 'driver_dashboard_fixed.html';
                 }
             } else {
                 showError('Invalid User ID or Password. Try demo credentials shown below.');
@@ -565,10 +566,11 @@
             const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
 
             if (hoursDiff < 24) {
+                // FIXED: Redirect to correct filenames
                 if (data.role === 'admin') {
-                    window.location.href = 'admin_dashboard.html';
+                    window.location.href = 'admin_dashboard_fixed.html';
                 } else {
-                    window.location.href = 'driver_dashboard.html';
+                    window.location.href = 'driver_dashboard_fixed.html';
                 }
             } else {
                 localStorage.removeItem('siquijorRides_session');
