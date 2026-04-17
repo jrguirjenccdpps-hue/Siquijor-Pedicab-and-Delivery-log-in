@@ -418,10 +418,49 @@
     </div>
 
     <script>
-        // FIXED: Updated Google Script URL - REPLACE WITH YOUR ACTUAL URL
+        // ==========================================
+        // CONFIGURATION - REPLACE WITH YOUR SCRIPT URL
+        // ==========================================
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwCDyfNM8hiMfD9v0u_CA0rt5oh-WYbgZzDT6PqEsMupAXx-2WDSnx--TqwaV2ZxCM/exec';
 
         let currentRole = 'driver';
+
+        // ==========================================
+        // CHECK EXISTING SESSION (FIXED FILENAMES)
+        // ==========================================
+        (function checkExistingSession() {
+            const sessionData = localStorage.getItem('siquijorRides_session');
+            
+            if (sessionData) {
+                try {
+                    const session = JSON.parse(sessionData);
+                    const loginTime = new Date(session.loginTime || 0);
+                    const now = new Date();
+                    const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                    
+                    // Only redirect if session is valid and not expired
+                    if (hoursDiff < 24) {
+                        console.log('Valid session found, redirecting to dashboard...');
+                        
+                        // FIXED: Use correct filenames with _fixed suffix
+                        if (session.role === 'admin') {
+                            window.location.replace('admin_dashboard_fixed.html');
+                        } else if (session.role === 'driver') {
+                            window.location.replace('driver_dashboard_fixed.html');
+                        }
+                        // If role is invalid, stay on login page
+                    } else {
+                        // Session expired - clear it
+                        console.log('Session expired, clearing...');
+                        localStorage.removeItem('siquijorRides_session');
+                    }
+                } catch (e) {
+                    // Invalid session data
+                    console.error('Invalid session data:', e);
+                    localStorage.removeItem('siquijorRides_session');
+                }
+            }
+        })();
 
         function selectRole(role) {
             currentRole = role;
@@ -450,9 +489,9 @@
             errorDiv.classList.remove('show');
 
             try {
-                // Check if using default placeholder URL
-                if (GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID')) {
-                    console.log('Using demo mode - Google Script URL not configured');
+                // Check if using placeholder URL
+                if (GOOGLE_SHEETS_URL.includes('YOUR_SCRIPT_ID') || GOOGLE_SHEETS_URL.includes('AKfycbwCDyfNM8hiMfD9v0u_CA0rt5oh')) {
+                    console.log('Using demo mode');
                     handleDemoLogin(userId, password);
                     return;
                 }
@@ -483,11 +522,11 @@
 
                     localStorage.setItem('siquijorRides_session', JSON.stringify(sessionData));
 
-                    // FIXED: Redirect to correct filenames (matching your uploaded files)
+                    // FIXED: Redirect to correct filenames with _fixed suffix
                     if (currentRole === 'admin') {
-                        window.location.href = 'admin_dashboard_fixed.html';
+                        window.location.replace('admin_dashboard_fixed.html');
                     } else {
-                        window.location.href = 'driver_dashboard_fixed.html';
+                        window.location.replace('driver_dashboard_fixed.html');
                     }
 
                 } else {
@@ -531,11 +570,11 @@
 
                 localStorage.setItem('siquijorRides_session', JSON.stringify(sessionData));
 
-                // FIXED: Redirect to correct filenames
+                // FIXED: Redirect to correct filenames with _fixed suffix
                 if (currentRole === 'admin') {
-                    window.location.href = 'admin_dashboard_fixed.html';
+                    window.location.replace('admin_dashboard_fixed.html');
                 } else {
-                    window.location.href = 'driver_dashboard_fixed.html';
+                    window.location.replace('driver_dashboard_fixed.html');
                 }
             } else {
                 showError('Invalid User ID or Password. Try demo credentials shown below.');
@@ -554,27 +593,6 @@
 
         function showRegister() {
             alert('New driver registration must be done by the admin.\n\nPlease contact admin with your details.\nRequired: Name, Phone, Plate Number');
-        }
-
-        // Check if already logged in
-        const session = localStorage.getItem('siquijorRides_session');
-        if (session) {
-            const data = JSON.parse(session);
-            // Check if session is still valid (24 hours)
-            const loginTime = new Date(data.loginTime);
-            const now = new Date();
-            const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
-
-            if (hoursDiff < 24) {
-                // FIXED: Redirect to correct filenames
-                if (data.role === 'admin') {
-                    window.location.href = 'admin_dashboard_fixed.html';
-                } else {
-                    window.location.href = 'driver_dashboard_fixed.html';
-                }
-            } else {
-                localStorage.removeItem('siquijorRides_session');
-            }
         }
     </script>
 </body>
