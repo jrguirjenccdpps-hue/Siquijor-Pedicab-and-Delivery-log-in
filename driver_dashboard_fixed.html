@@ -719,14 +719,33 @@
         .gps-error-message.show {
             display: block;
         }
+
+        /* Offline Banner */
+        .offline-banner {
+            background: linear-gradient(135deg, #FFA502 0%, #FF7F50 100%);
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+        }
+
+        .offline-banner.show {
+            display: block;
+        }
     </style>
 </head>
 <body>
+    <div class="offline-banner" id="offlineBanner">
+        <i class="fas fa-wifi-slash"></i> You're offline. Some features may not work.
+    </div>
+
     <div class="app-container">
         <div class="header">
             <div class="header-top">
                 <span style="color: white; font-size: 12px; opacity: 0.9;">🏝️ Siquijor Rides</span>
-                <button class="logout-btn" onclick="logout()">
+                <button class="logout-btn" id="logoutBtn" type="button">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
             </div>
@@ -765,7 +784,7 @@
 
         <div class="toggle-container">
             <span class="toggle-label">Offline</span>
-            <div class="toggle-switch active" id="onlineToggle" onclick="toggleOnline()"></div>
+            <div class="toggle-switch active" id="onlineToggle"></div>
             <span class="toggle-label" style="color: #2ECC71;">Online</span>
         </div>
 
@@ -785,7 +804,7 @@
                 <div class="coords" id="coordinates">📍 Locating...</div>
             </div>
             <div class="gps-error-message" id="gpsErrorMsg">
-                <i class="fas fa-exclamation-triangle"></i> GPS access denied. Please enable location services in your browser settings.
+                <i class="fas fa-exclamation-triangle"></i> GPS access denied. Please enable location services.
             </div>
         </div>
 
@@ -797,7 +816,7 @@
 
         <p class="last-updated" id="lastUpdated">Last updated: Just now</p>
 
-        <button class="refresh-btn" onclick="refreshBookings()">
+        <button class="refresh-btn" id="refreshBtn">
             <i class="fas fa-sync-alt"></i> Refresh Bookings
         </button>
 
@@ -875,13 +894,17 @@
     <div class="toast" id="toast">Action Completed! 🌴</div>
 
     <script>
+        // ==========================================
+        // CONFIGURATION - UPDATE THIS URL
+        // ==========================================
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwCDyfNM8hiMfD9v0u_CA0rt5oh-WYbgZzDT6PqEsMupAXx-2WDSnx--TqwaV2ZxCM/exec';
-
-        // Check authentication
+        
+        // ==========================================
+        // AUTHENTICATION CHECK
+        // ==========================================
         const session = JSON.parse(localStorage.getItem('siquijorRides_session') || '{}');
         if (!session.userId || session.role !== 'driver') {
-            // FIXED: Redirect to correct filename
-            window.location.href = 'index.html';
+            window.location.replace('./');
         }
 
         const DRIVER_ID = session.userId;
@@ -892,26 +915,92 @@
         document.getElementById('driverName').textContent = DRIVER_NAME;
         document.getElementById('plateNumber').textContent = PLATE_NUMBER;
 
+        // ==========================================
+        // STATE VARIABLES
+        // ==========================================
         let isOnline = true;
         let driverLocation = { lat: null, lng: null };
         let watchId = null;
         let availableBookings = [];
         let myTrips = [];
+        let onlineStartTime = Date.now();
 
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
         document.addEventListener('DOMContentLoaded', function() {
+            // Bind all event listeners
+            bindEventListeners();
+            
+            // Load data
             loadDriverData();
             startGPSTracking();
             fetchVerifiedBookings();
+            
+            // Set up intervals
             setInterval(fetchVerifiedBookings, 30000);
+            setInterval(updateOnlineHours, 60000);
+            
+            // Check online status
+            updateOnlineStatus();
         });
 
-       function logout() {
-    if (confirm('Are you sure you want to logout? 🌴')) {
-        localStorage.removeItem('siquijorRides_session');
-        window.location.href = 'index.html'; // This is correct
-    }
-}
+        function bindEventListeners() {
+            // Logout button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', logout);
+            }
 
+            // Online toggle
+            const toggle = document.getElementById('onlineToggle');
+            if (toggle) {
+                toggle.addEventListener('click', toggleOnline);
+            }
+
+            // Refresh button
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', refreshBookings);
+            }
+
+            // Network status
+            window.addEventListener('online', () => {
+                document.getElementById('offlineBanner').classList.remove('show');
+                showToast('🌐 Back online!');
+            });
+            
+            window.addEventListener('offline', () => {
+                document.getElementById('offlineBanner').classList.add('show');
+            });
+        }
+
+        // ==========================================
+        // LOGOUT FUNCTION (FIXED)
+        // ==========================================
+        function logout() {
+            if (confirm('Are you sure you want to logout? 🌴')) {
+                // Stop GPS tracking
+                stopGPSTracking();
+                
+                // Clear all driver data
+                localStorage.removeItem('siquijorRides_session');
+                localStorage.removeItem('verifiedBookings');
+                localStorage.removeItem('todayEarnings_' + DRIVER_ID);
+                localStorage.removeItem('todayTrips_' + DRIVER_ID);
+                localStorage.removeItem('onlineStartTime_' + DRIVER_ID);
+                
+                // Update driver status to offline before leaving
+                updateDriverStatus('offline').finally(() => {
+                    // Redirect to login page
+                    window.location.replace('./');
+                });
+            }
+        }
+
+        // ==========================================
+        // ONLINE/OFFLINE TOGGLE
+        // ==========================================
         function toggleOnline() {
             isOnline = !isOnline;
             const toggle = document.getElementById('onlineToggle');
@@ -922,6 +1011,8 @@
                 toggle.classList.add('active');
                 statusText.textContent = 'Online';
                 indicator.className = 'status-online';
+                onlineStartTime = Date.now();
+                localStorage.setItem('onlineStartTime_' + DRIVER_ID, onlineStartTime);
                 showToast('🏝️ You are now ONLINE and ready for island adventures!');
                 startGPSTracking();
                 fetchVerifiedBookings();
@@ -933,20 +1024,34 @@
                 stopGPSTracking();
             }
 
-            updateDriverStatus();
+            updateDriverStatus(isOnline ? 'online' : 'offline');
         }
 
-        // FIXED: Better GPS handling with error states
+        function updateOnlineStatus() {
+            const savedTime = localStorage.getItem('onlineStartTime_' + DRIVER_ID);
+            if (savedTime) {
+                onlineStartTime = parseInt(savedTime);
+            }
+        }
+
+        function updateOnlineHours() {
+            if (!isOnline) return;
+            
+            const hours = Math.floor((Date.now() - onlineStartTime) / (1000 * 60 * 60));
+            document.getElementById('onlineHours').textContent = hours + 'h';
+        }
+
+        // ==========================================
+        // GPS TRACKING
+        // ==========================================
         function startGPSTracking() {
             if (!navigator.geolocation) {
                 showGPSError('GPS not supported on this device');
                 return;
             }
 
-            // Request permission and start tracking
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    // Success - start watching
                     watchId = navigator.geolocation.watchPosition(
                         (position) => {
                             driverLocation = {
@@ -960,15 +1065,11 @@
                             sendLocationToServer();
                             clearGPSError();
                         },
-                        (error) => {
-                            handleGPSError(error);
-                        },
+                        (error) => handleGPSError(error),
                         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                     );
                 },
-                (error) => {
-                    handleGPSError(error);
-                },
+                (error) => handleGPSError(error),
                 { enableHighAccuracy: true, timeout: 10000 }
             );
         }
@@ -1017,7 +1118,7 @@
         }
 
         function sendLocationToServer() {
-            if (!driverLocation.lat) return;
+            if (!driverLocation.lat || !navigator.onLine) return;
 
             fetch(GOOGLE_SHEETS_URL, {
                 method: 'POST',
@@ -1026,38 +1127,45 @@
                     driverId: DRIVER_ID,
                     location: driverLocation
                 })
-            }).catch(() => {
-                // Silently fail - offline mode
-            });
+            }).catch(() => {});
         }
 
+        // ==========================================
+        // BOOKINGS MANAGEMENT
+        // ==========================================
         async function fetchVerifiedBookings() {
-            if (!isOnline) return;
+            if (!isOnline || !navigator.onLine) return;
 
             try {
                 const response = await fetch(GOOGLE_SHEETS_URL + '?action=get_verified_bookings');
                 const data = await response.json();
 
-                if (data.bookings && data.bookings.length > 0) {
+                if (data.success && data.bookings) {
                     availableBookings = data.bookings;
                     renderBookings(data.bookings);
                 } else {
                     renderEmptyState();
                 }
 
-                document.getElementById('lastUpdated').textContent = 
-                    '🌴 Last updated: ' + new Date().toLocaleTimeString();
+                updateLastUpdated();
 
             } catch (error) {
-                const cached = localStorage.getItem('verifiedBookings');
-                if (cached) renderBookings(JSON.parse(cached));
+                console.error('Fetch error:', error);
+                useCachedBookings();
+            }
+        }
+
+        function useCachedBookings() {
+            const cached = localStorage.getItem('verifiedBookings');
+            if (cached) {
+                renderBookings(JSON.parse(cached));
             }
         }
 
         function renderBookings(bookings) {
             const container = document.getElementById('pendingBookings');
 
-            if (bookings.length === 0) {
+            if (!bookings || bookings.length === 0) {
                 renderEmptyState();
                 return;
             }
@@ -1078,25 +1186,25 @@
                     <div class="route-info">
                         <div class="route-point">
                             <div class="route-dot"></div>
-                            <span><strong>Pickup:</strong> ${booking.pickup}</span>
+                            <span><strong>Pickup:</strong> ${escapeHtml(booking.pickup)}</span>
                         </div>
                         <div class="route-line"></div>
                         <div class="route-point">
                             <div class="route-dot destination"></div>
-                            <span><strong>Destination:</strong> ${booking.destination}</span>
+                            <span><strong>Destination:</strong> ${escapeHtml(booking.destination)}</span>
                         </div>
                     </div>
 
                     <div class="customer-info">
                         <i class="fas fa-user"></i>
-                        <span>${booking.customerName} • ${booking.phone}</span>
+                        <span>${escapeHtml(booking.customerName)} • ${escapeHtml(booking.phone)}</span>
                     </div>
 
                     <div class="payment-verified">
                         <i class="fas fa-check-circle"></i>
                         <div>
                             <strong>✅ Payment Verified by Admin</strong><br>
-                            <small>Ref: ${booking.paymentRef}</small>
+                            <small>Ref: ${escapeHtml(booking.paymentRef)}</small>
                         </div>
                     </div>
 
@@ -1129,7 +1237,15 @@
             `;
         }
 
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         function formatTime(timestamp) {
+            if (!timestamp) return 'Just now';
             const date = new Date(timestamp);
             const now = new Date();
             const diff = Math.floor((now - date) / 1000 / 60);
@@ -1139,6 +1255,14 @@
             return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }
 
+        function updateLastUpdated() {
+            document.getElementById('lastUpdated').textContent = 
+                '🌴 Last updated: ' + new Date().toLocaleTimeString();
+        }
+
+        // ==========================================
+        // BOOKING ACTIONS
+        // ==========================================
         async function acceptBooking(bookingId) {
             const btn = event.target.closest('.btn-accept');
             btn.disabled = true;
@@ -1169,15 +1293,17 @@
                         booking.status = 'accepted';
                         myTrips.push(booking);
                         renderActiveTrips();
+                        updateEarnings(booking.fare * 0.8);
                     }
 
                     availableBookings = availableBookings.filter(b => b.id !== bookingId);
                     renderBookings(availableBookings);
-                    updateEarnings(booking.fare * 0.8);
+                } else {
+                    throw new Error(result.message || 'Failed to accept');
                 }
 
             } catch (error) {
-                showToast('❌ Error accepting booking');
+                showToast('❌ ' + error.message);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-check"></i> Accept';
             }
@@ -1185,8 +1311,10 @@
 
         function declineBooking(bookingId) {
             const card = document.querySelector(`[data-booking-id="${bookingId}"]`);
-            card.style.transform = 'translateX(-100%)';
-            card.style.opacity = '0';
+            if (card) {
+                card.style.transform = 'translateX(-100%)';
+                card.style.opacity = '0';
+            }
 
             setTimeout(() => {
                 availableBookings = availableBookings.filter(b => b.id !== bookingId);
@@ -1225,18 +1353,18 @@
                     <div class="route-info">
                         <div class="route-point">
                             <div class="route-dot"></div>
-                            <span>${trip.pickup}</span>
+                            <span>${escapeHtml(trip.pickup)}</span>
                         </div>
                         <div class="route-line"></div>
                         <div class="route-point">
                             <div class="route-dot destination"></div>
-                            <span>${trip.destination}</span>
+                            <span>${escapeHtml(trip.destination)}</span>
                         </div>
                     </div>
 
                     <div class="customer-info">
                         <i class="fas fa-user"></i>
-                        <span>${trip.customerName} • ${trip.phone}</span>
+                        <span>${escapeHtml(trip.customerName)} • ${escapeHtml(trip.phone)}</span>
                     </div>
 
                     <button class="btn btn-complete" onclick="completeTrip('${trip.id}')" style="width: 100%;">
@@ -1248,7 +1376,7 @@
 
         async function completeTrip(tripId) {
             try {
-                await fetch(GOOGLE_SHEETS_URL, {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     body: JSON.stringify({
                         type: 'complete_trip',
@@ -1258,22 +1386,33 @@
                     })
                 });
 
-                showToast('🎉 Trip completed! Great job! 🌴');
-                myTrips = myTrips.filter(t => t.id !== tripId);
-                renderActiveTrips();
+                const result = await response.json();
+
+                if (result.success) {
+                    showToast('🎉 Trip completed! Great job! 🌴');
+                    myTrips = myTrips.filter(t => t.id !== tripId);
+                    renderActiveTrips();
+                } else {
+                    throw new Error(result.message);
+                }
 
             } catch (error) {
-                showToast('Trip completed! 🏝️');
+                // Offline fallback
+                showToast('✅ Trip completed locally! 🏝️');
                 myTrips = myTrips.filter(t => t.id !== tripId);
                 renderActiveTrips();
             }
         }
 
+        // ==========================================
+        // EARNINGS & STATS
+        // ==========================================
         function updateEarnings(amount) {
             let current = parseFloat(localStorage.getItem('todayEarnings_' + DRIVER_ID) || '0');
             current += amount;
             localStorage.setItem('todayEarnings_' + DRIVER_ID, current);
             document.getElementById('todayEarnings').textContent = '₱' + Math.floor(current);
+            document.getElementById('netEarnings').textContent = '₱' + Math.floor(current);
 
             let trips = parseInt(localStorage.getItem('todayTrips_' + DRIVER_ID) || '0');
             trips += 1;
@@ -1287,31 +1426,46 @@
 
             document.getElementById('todayEarnings').textContent = '₱' + Math.floor(earnings);
             document.getElementById('totalTrips').textContent = trips;
+            document.getElementById('netEarnings').textContent = '₱' + Math.floor(earnings);
         }
 
-        function updateDriverStatus() {
-            fetch(GOOGLE_SHEETS_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    type: 'driver_status',
-                    driverId: DRIVER_ID,
-                    status: isOnline ? 'online' : 'offline',
-                    timestamp: new Date().toISOString()
-                })
-            }).catch(() => {
-                // Offline fallback - status will sync when online
-            });
+        async function updateDriverStatus(status) {
+            if (!navigator.onLine) return;
+
+            try {
+                await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        type: 'driver_status',
+                        driverId: DRIVER_ID,
+                        status: status,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+            } catch (e) {
+                // Silent fail
+            }
         }
 
         function refreshBookings() {
-            const btn = document.querySelector('.refresh-btn');
+            const btn = document.getElementById('refreshBtn');
             btn.classList.add('spinning');
+            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refreshing...';
 
             fetchVerifiedBookings().then(() => {
-                setTimeout(() => btn.classList.remove('spinning'), 500);
+                setTimeout(() => {
+                    btn.classList.remove('spinning');
+                    btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Bookings';
+                }, 500);
+            }).catch(() => {
+                btn.classList.remove('spinning');
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Bookings';
             });
         }
 
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
